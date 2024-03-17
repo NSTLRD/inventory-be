@@ -15,7 +15,7 @@ import com.mentorly.inventorybe.model.Product;
 import com.mentorly.inventorybe.repository.MarketRepository;
 import com.mentorly.inventorybe.repository.ProductRepository;
 import com.mentorly.inventorybe.service.ProductService;
-import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,14 +28,15 @@ import java.util.stream.Collectors;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private ProductRepository productRepository;
-
-    private MarketRepository marketRepository;
+    private final ProductRepository productRepository;
+    private final MarketRepository marketRepository;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, MarketRepository marketRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, MarketRepository marketRepository, ModelMapper modelMapper) {
         this.productRepository = productRepository;
         this.marketRepository = marketRepository;
+        this.modelMapper = modelMapper;
     }
 
 
@@ -47,26 +48,10 @@ public class ProductServiceImpl implements ProductService {
             markets.addAll(marketRepository.findAllById(productCreateDTO.getMarketIds()));
         }
 
-        Product product = new Product();
-        product.setName(productCreateDTO.getName());
-        product.setDescription(productCreateDTO.getDescription());
-        product.setPrice(productCreateDTO.getPrice());
+        Product product = modelMapper.map(productCreateDTO, Product.class);
         product.setMarkets(markets);
         product = productRepository.save(product);
 
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(product.getId());
-        productDTO.setName(product.getName());
-        productDTO.setDescription(product.getDescription());
-        productDTO.setPrice(product.getPrice());
-        productDTO.setMarkets(markets.stream().map(market -> {
-            MarketDTO marketDTO = new MarketDTO();
-            marketDTO.setId(market.getId());
-            marketDTO.setName(market.getName());
-            marketDTO.setLocation(market.getLocation());
-            return marketDTO;
-        }).collect(Collectors.toList()));
-
-        return productDTO;
+        return modelMapper.map(product, ProductDTO.class);
     }
 }

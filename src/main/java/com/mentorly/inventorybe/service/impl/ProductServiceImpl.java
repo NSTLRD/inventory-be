@@ -15,6 +15,7 @@ import com.mentorly.inventorybe.model.Product;
 import com.mentorly.inventorybe.repository.MarketRepository;
 import com.mentorly.inventorybe.repository.ProductRepository;
 import com.mentorly.inventorybe.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,19 +30,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final MarketRepository marketRepository;
     private final ModelMapper modelMapper;
-
-    @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, MarketRepository marketRepository, ModelMapper modelMapper) {
-        this.productRepository = productRepository;
-        this.marketRepository = marketRepository;
-        this.modelMapper = modelMapper;
-    }
-
 
     @Override
     @Transactional
